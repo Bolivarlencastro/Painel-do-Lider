@@ -32,7 +32,8 @@ const getMemberCoursePerformance = (memberId: string, courseId: string): number 
 
 export const MemberTrailProgressDetail: React.FC<MemberTrailProgressDetailProps> = ({ member, trail, allCourses, allEnrollments, onBack, onCourseSelect }) => {
     const coursesInTrail = allCourses.filter(course => trail.courseIds.includes(course.id));
-    const memberEnrollmentsMap = new Map(allEnrollments.filter(e => e.memberId === member.id).map(e => [e.courseId, e]));
+    // FIX: Explicitly type the Map to ensure correct type inference for `enrollment`.
+    const memberEnrollmentsMap: Map<string, Enrollment> = new Map(allEnrollments.filter(e => e.memberId === member.id).map(e => [e.courseId, e]));
 
     return (
         <div className="p-4 sm:p-6">

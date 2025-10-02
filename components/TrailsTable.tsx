@@ -116,8 +116,9 @@ export const TrailsTable: React.FC<TrailsTableProps> = ({ trails, members, onRow
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const trailsWithStats = useMemo(() => {
-    const courseMap = new Map(allCourses.map(c => [c.id, c]));
-    const pulseMap = new Map(allPulses.map(p => [p.id, p]));
+    // FIX: Explicitly type Maps to prevent type inference issues.
+    const courseMap: Map<string, Course> = new Map(allCourses.map(c => [c.id, c]));
+    const pulseMap: Map<string, Pulse> = new Map(allPulses.map(p => [p.id, p]));
 
     return trails.map(trail => {
       const enrolledMembers = members.filter(member => member.trailIds.includes(trail.id));

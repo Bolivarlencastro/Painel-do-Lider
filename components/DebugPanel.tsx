@@ -39,10 +39,10 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({ activeCases, toggleCase 
 
     return (
         <>
-            <div className="fixed bottom-4 right-4 z-[100]">
+            <div className="fixed bottom-0 right-0 z-[100] w-24 h-24 group">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="w-14 h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform transform hover:scale-110"
+                    className="absolute bottom-4 right-4 w-14 h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-110"
                     aria-label="Open debug panel"
                 >
                     <Icon name="science" size="md" />

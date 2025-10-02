@@ -37,8 +37,9 @@ export const ImmediateActionTable: React.FC<ImmediateActionTableProps> = ({ memb
   };
 
   const { displayItems, totalCount } = React.useMemo(() => {
-    const memberMap = new Map(members.map(m => [m.id, m]));
-    const courseMap = new Map(COURSES_DATA.map(c => [c.id, c]));
+    // FIX: Explicitly type Maps to prevent type inference issues.
+    const memberMap: Map<string, TeamMember> = new Map(members.map(m => [m.id, m]));
+    const courseMap: Map<string, Course> = new Map(COURSES_DATA.map(c => [c.id, c]));
     const items: ActionableItem[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);

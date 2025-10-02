@@ -1,5 +1,5 @@
 import React from 'react';
-import { Enrollment, TeamMember } from '../types';
+import { Enrollment, TeamMember, Course } from '../types';
 import { Icon } from './Icon';
 import { COURSES_DATA } from '../constants';
 
@@ -38,8 +38,9 @@ const DueDate: React.FC<{ dueDate: string }> = ({ dueDate }) => {
 
 
 export const MandatoryCoursesTable: React.FC<MandatoryCoursesTableProps> = ({ enrollments, members, onViewDetails, onViewAll, isTeamEmpty }) => {
-  const memberMap = new Map(members.map(m => [m.id, m]));
-  const courseMap = new Map(COURSES_DATA.map(c => [c.id, c]));
+  // FIX: Explicitly type Maps to prevent type inference issues.
+  const memberMap: Map<string, TeamMember> = new Map(members.map(m => [m.id, m]));
+  const courseMap: Map<string, Course> = new Map(COURSES_DATA.map(c => [c.id, c]));
   
   const handleViewDetails = (e: React.MouseEvent, member: TeamMember) => {
     e.stopPropagation();

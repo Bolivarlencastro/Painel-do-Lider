@@ -34,7 +34,8 @@ export const FreeEnrollmentsTable: React.FC<FreeEnrollmentsTableProps> = ({ memb
   };
 
   const { displayItems, totalCount } = React.useMemo(() => {
-    const memberMap = new Map(members.map(m => [m.id, m]));
+    // FIX: Explicitly type Maps to prevent type inference issues.
+    const memberMap: Map<string, TeamMember> = new Map(members.map(m => [m.id, m]));
     const courseMap = new Map(COURSES_DATA.map(c => [c.id, c.name]));
     const items: ActionableItem[] = [];
     const today = new Date();

@@ -39,6 +39,7 @@ const App: React.FC = () => {
   const [activeDashboardView, setActiveDashboardView] = useState<View>('visaoGeral');
   const [activeSidebarItem, setActiveSidebarItem] = useState<string>('dashboard');
   const [activeEdgeCases, setActiveEdgeCases] = useState(new Set<string>());
+  const [selectedLeaderIds, setSelectedLeaderIds] = useState<string[]>([]);
 
   const toggleEdgeCase = useCallback((caseName: string) => {
     analytics.track('debug_case_toggled', { case: caseName });
@@ -52,6 +53,16 @@ const App: React.FC = () => {
         return newSet;
     });
   }, []);
+  
+  const isImpersonationEnabled = activeEdgeCases.has('IMPERSONATE_LEADER');
+
+  useEffect(() => {
+    // Clear selection when impersonation is turned off
+    if (!isImpersonationEnabled) {
+        setSelectedLeaderIds([]);
+    }
+  }, [isImpersonationEnabled]);
+
 
   useEffect(() => {
     analytics.track('app_loaded', { theme });
@@ -70,6 +81,8 @@ const App: React.FC = () => {
   const toggleTheme = useCallback(() => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   }, []);
+
+  const leaders = useMemo(() => TEAM_MEMBERS_DATA.filter(member => !member.managerId), []);
 
   const modifiedData = useMemo(() => {
       let members: TeamMember[] = JSON.parse(JSON.stringify(TEAM_MEMBERS_DATA));
@@ -149,42 +162,36 @@ const App: React.FC = () => {
           memberRanking = [];
       }
       
-      if (activeEdgeCases.has('IMPERSONATE_LEADER')) {
-        const impersonatedId = '2'; // João Silva
-        const impersonatedMember = members.find(m => m.id === impersonatedId);
+      if (isImpersonationEnabled && selectedLeaderIds.length > 0) {
+        const selectedLeaderIdsSet = new Set(selectedLeaderIds);
 
-        if (impersonatedMember) {
-            const memberEnrollments = enrollments.filter(e => e.memberId === impersonatedId);
-            const courseIds = new Set(memberEnrollments.map(e => e.courseId));
-            const trailIds = new Set(impersonatedMember.trailIds);
-            const eventIds = new Set(impersonatedMember.eventIds);
-            const channelIds = new Set(impersonatedMember.channelIds);
-            const pulseIds = new Set(impersonatedMember.pulseIds);
+        // Filter for the TEAM MEMBERS of the selected LEADERS
+        members = TEAM_MEMBERS_DATA.filter(m => m.managerId && selectedLeaderIdsSet.has(m.managerId));
+        
+        const memberIds = new Set(members.map(m => m.id));
+        
+        enrollments = ENROLLMENTS_DATA.filter(e => memberIds.has(e.memberId));
+        const courseIds = new Set(enrollments.map(e => e.courseId));
+        const trailIds = new Set(members.flatMap(m => m.trailIds));
+        const eventIds = new Set(members.flatMap(m => m.eventIds));
+        const channelIds = new Set(members.flatMap(m => m.channelIds));
+        const pulseIds = new Set(members.flatMap(m => m.pulseIds));
 
-            members = [impersonatedMember];
-            enrollments = memberEnrollments;
-            courses = courses.filter(c => courseIds.has(c.id));
-            trails = trails.filter(t => trailIds.has(t.id));
-            events = events.filter(e => eventIds.has(e.id));
-            channels = channels.filter(ch => channelIds.has(ch.id));
-            pulses = pulses.filter(p => pulseIds.has(p.id));
-            memberRanking = memberRanking.filter(r => r.id === impersonatedId);
-        } else {
-            return { members: [], courses: [], trails: [], events: [], channels: [], pulses: [], enrollments: [], memberRanking: [] };
-        }
+        courses = COURSES_DATA.filter(c => courseIds.has(c.id));
+        trails = TRAILS_DATA.filter(t => trailIds.has(t.id));
+        events = EVENTS_DATA.filter(e => eventIds.has(e.id));
+        channels = CHANNELS_DATA.filter(ch => channelIds.has(ch.id));
+        pulses = PULSES_DATA.filter(p => pulseIds.has(p.id));
+        memberRanking = MEMBER_RANKING_DATA.filter(r => memberIds.has(r.id));
+      } else if (isImpersonationEnabled) {
+        // If impersonation is on but no leader is selected, show an empty state
+        return { members: [], courses: [], trails: [], events: [], channels: [], pulses: [], enrollments: [], memberRanking: [] };
       }
 
-      return { members, courses, trails, events, channels, pulses, enrollments, memberRanking };
-  }, [activeEdgeCases]);
-  
-  const impersonatedLeaderName = useMemo(() => {
-    if (activeEdgeCases.has('IMPERSONATE_LEADER')) {
-        const leader = TEAM_MEMBERS_DATA.find(m => m.id === '2'); // Hardcoded ID for João Silva
-        return leader ? leader.name : null;
-    }
-    return null;
-  }, [activeEdgeCases]);
 
+      return { members, courses, trails, events, channels, pulses, enrollments, memberRanking };
+  }, [activeEdgeCases, selectedLeaderIds, isImpersonationEnabled]);
+  
   const isRankingEnabled = !activeEdgeCases.has('DISABLE_RANKING');
   const isNormativasModuleEnabled = !activeEdgeCases.has('DISABLE_MANDATORY');
   const isKpiComparisonEnabled = activeEdgeCases.has('ENABLE_KPI_COMPARISON');
@@ -209,6 +216,7 @@ const App: React.FC = () => {
               setActiveView={setActiveDashboardView}
               setActiveSidebarItem={setActiveSidebarItem}
               teamMembers={modifiedData.members}
+              leaders={leaders}
               courses={modifiedData.courses}
               trails={modifiedData.trails}
               events={modifiedData.events}
@@ -219,7 +227,9 @@ const App: React.FC = () => {
               isRankingEnabled={isRankingEnabled}
               isNormativasModuleEnabled={isNormativasModuleEnabled}
               isKpiComparisonEnabled={isKpiComparisonEnabled}
-              impersonatedLeaderName={impersonatedLeaderName}
+              isImpersonationEnabled={isImpersonationEnabled}
+              selectedLeaderIds={selectedLeaderIds}
+              setSelectedLeaderIds={setSelectedLeaderIds}
             />
            )}
           {currentView === 'admin' && <AdminView />}

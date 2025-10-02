@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Icon } from './Icon';
 import { EnhancedKpiCard } from './EnhancedKpiCard';
@@ -23,6 +24,7 @@ import { FreeEnrollmentsTable } from './FreeEnrollmentsTable';
 import { View, TeamMember, Course, Trail, Event, SelectedItem, Channel, Pulse, EnhancedKpiData, TrendDirection, MemberRankingItem, Enrollment, EnrollmentStatus, EnrollmentType } from '../types';
 import { analytics } from '../services/analytics';
 import { LocalSortConfig } from './TeamMembersTable';
+import { ImpersonationSelector } from './ImpersonationSelector';
 
 
 // --- KPI Calculation Logic ---
@@ -192,6 +194,7 @@ interface DashboardProps {
   setActiveView: (view: View) => void;
   setActiveSidebarItem: (id: string) => void;
   teamMembers: TeamMember[];
+  leaders: TeamMember[];
   courses: Course[];
   trails: Trail[];
   events: Event[];
@@ -202,7 +205,9 @@ interface DashboardProps {
   isRankingEnabled: boolean;
   isNormativasModuleEnabled: boolean;
   isKpiComparisonEnabled: boolean;
-  impersonatedLeaderName: string | null;
+  isImpersonationEnabled: boolean;
+  selectedLeaderIds: string[];
+  setSelectedLeaderIds: (ids: string[]) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ 
@@ -210,6 +215,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setActiveView, 
     setActiveSidebarItem,
     teamMembers,
+    leaders,
     courses,
     trails,
     events,
@@ -220,7 +226,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
     isRankingEnabled,
     isNormativasModuleEnabled,
     isKpiComparisonEnabled,
-    impersonatedLeaderName
+    isImpersonationEnabled,
+    selectedLeaderIds,
+    setSelectedLeaderIds
 }) => {
   const [isNpsModalOpen, setNpsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
@@ -366,6 +374,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
             </div>
             <div className="flex items-center gap-4">
+              {isImpersonationEnabled && (
+                  <ImpersonationSelector
+                    leaders={leaders}
+                    selectedIds={selectedLeaderIds}
+                    onSelectionChange={setSelectedLeaderIds}
+                  />
+              )}
             </div>
           </div>
           
@@ -382,12 +397,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
         
-        {impersonatedLeaderName && (
-            <div className="bg-yellow-100 dark:bg-yellow-900/40 border-b border-t border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 text-sm text-center py-2 px-4 flex items-center justify-center gap-2 shrink-0">
-                <Icon name="visibility" size="sm" />
-                Você está visualizando o painel como <strong>{impersonatedLeaderName}</strong>. (Visão de Debug ativada)
-            </div>
-        )}
       
         <div className={isTableView ? 'flex-1 min-h-0' : ''}>
           {renderCurrentView()}

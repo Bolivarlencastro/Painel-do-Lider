@@ -118,6 +118,7 @@ export interface TeamMember {
   name: string;
   jobTitle: string;
   avatarUrl: string;
+  managerId?: string;
   overallProgress: number;
   coursesCompleted: number;
   totalCourses: number;
