@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { EnhancedKpiCard } from './EnhancedKpiCard';
 import { EnhancedKpiData, TeamMember, LeaderMetrics } from '../types';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { analytics } from '../services/analytics';
 import { LeadersRankingTable } from './LeadersRankingTable';
 import { LeadersActionTable } from './LeadersActionTable';
@@ -105,19 +105,53 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ teamMembers, leade
     },
   ];
 
-  // Calculate status distribution for top leaders
-  const statusDistributionData = leaderMetrics.slice(0, 5).map(leader => {
-    const team = teamMembers.filter(m => m.managerId === leader.leaderId);
-    const onTrack = team.filter(m => (m.performance || 0) >= 80).length;
-    const late = team.filter(m => (m.performance || 0) >= 50 && (m.performance || 0) < 80).length;
-    const notStarted = team.filter(m => (m.performance || 0) < 50).length;
-    return {
-      leader: leader.leaderName.split(' ')[0], // First name only
-      onTrack,
-      late,
-      notStarted
-    };
-  });
+  const [timeRange, setTimeRange] = useState<'month' | 'quarter' | 'semester' | 'year'>('month');
+
+  const getEngagementData = () => {
+    switch (timeRange) {
+      case 'month':
+        return [
+          { name: 'Sem 1', value: 65 },
+          { name: 'Sem 2', value: 68 },
+          { name: 'Sem 3', value: 72 },
+          { name: 'Sem 4', value: 75 },
+        ];
+      case 'quarter':
+        return [
+          { name: 'Jan', value: 65 },
+          { name: 'Fev', value: 70 },
+          { name: 'Mar', value: 78 },
+        ];
+      case 'semester':
+        return [
+          { name: 'Jan', value: 65 },
+          { name: 'Fev', value: 70 },
+          { name: 'Mar', value: 78 },
+          { name: 'Abr', value: 82 },
+          { name: 'Mai', value: 80 },
+          { name: 'Jun', value: 85 },
+        ];
+      case 'year':
+        return [
+          { name: 'Jan', value: 65 },
+          { name: 'Fev', value: 70 },
+          { name: 'Mar', value: 78 },
+          { name: 'Abr', value: 82 },
+          { name: 'Mai', value: 80 },
+          { name: 'Jun', value: 85 },
+          { name: 'Jul', value: 88 },
+          { name: 'Ago', value: 86 },
+          { name: 'Set', value: 90 },
+          { name: 'Out', value: 92 },
+          { name: 'Nov', value: 95 },
+          { name: 'Dez', value: 94 },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const engagementData = getEngagementData();
 
   return (
     <div className="flex flex-col h-full">
@@ -166,33 +200,73 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ teamMembers, leade
             <LeadersRankingTable leaderMetrics={leaderMetrics} onLeaderClick={onLeaderClick} />
           </div>
 
-          {/* Gráfico de distribuição de status */}
+          {/* Gráfico de Evolução de Engajamento */}
           <div className="bg-white dark:bg-gray-800/60 p-4 sm:p-6 rounded-xl border border-gray-200 dark:border-gray-700/80 shadow-lg">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-              Distribuição de Liderados por Status
-            </h2>
+            <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                Evolução do Engajamento
+              </h2>
+              <div className="flex gap-2 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-lg">
+                {(['month', 'quarter', 'semester', 'year'] as const).map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setTimeRange(range)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                      timeRange === range
+                        ? 'bg-white dark:bg-gray-600 text-purple-700 dark:text-purple-300 shadow-sm'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                    }`}
+                  >
+                    {range === 'month' && 'Mês'}
+                    {range === 'quarter' && 'Trimestre'}
+                    {range === 'semester' && 'Semestre'}
+                    {range === 'year' && 'Ano'}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div style={{ width: '100%', height: 300 }}>
               <ResponsiveContainer>
-                <BarChart
-                  data={statusDistributionData}
+                <LineChart
+                  data={engagementData}
                   margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid-stroke)" />
-                  <XAxis dataKey="leader" stroke="var(--chart-text-stroke)" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="var(--chart-text-stroke)" fontSize={12} tickLine={false} axisLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid-stroke)" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="var(--chart-text-stroke)" 
+                    fontSize={12} 
+                    tickLine={false} 
+                    axisLine={false}
+                    dy={10}
+                  />
+                  <YAxis 
+                    stroke="var(--chart-text-stroke)" 
+                    fontSize={12} 
+                    tickLine={false} 
+                    axisLine={false}
+                    tickFormatter={(value) => `${value}%`}
+                    domain={[0, 100]}
+                  />
                   <Tooltip
-                    cursor={{ fill: 'rgba(128, 90, 213, 0.1)' }}
+                    cursor={{ stroke: 'var(--chart-grid-stroke)', strokeWidth: 2 }}
                     contentStyle={{ 
                       backgroundColor: 'var(--chart-tooltip-bg)', 
                       border: '1px solid var(--chart-tooltip-border)', 
-                      borderRadius: '0.5rem' 
+                      borderRadius: '0.5rem',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
-                  <Legend verticalAlign="top" align="right" height={40} iconSize={10} wrapperStyle={{fontSize: "12px"}}/>
-                  <Bar name="Em Dia" dataKey="onTrack" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                  <Bar name="Atrasado" dataKey="late" stackId="a" fill="#f59e0b" radius={[0, 0, 0, 0]} />
-                  <Bar name="Não Iniciado" dataKey="notStarted" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                </BarChart>
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    name="Engajamento"
+                    stroke="var(--chart-line-main-stroke)" 
+                    strokeWidth={3}
+                    dot={{ r: 4, strokeWidth: 2, fill: 'var(--chart-tooltip-bg)' }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
