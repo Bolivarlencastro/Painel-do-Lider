@@ -135,6 +135,8 @@ export interface TeamMember {
 
 export type View = 'visaoGeral' | 'liderados' | 'cursos' | 'trilhas' | 'eventos' | 'canais' | 'pulses';
 
+export type MainView = 'analytics' | 'management';
+
 export type SelectedItem =
   | { type: 'member'; data: TeamMember }
   | { type: 'course'; data: Course }
@@ -325,4 +327,40 @@ export interface ExpiringCourseItem {
   memberId: string;
   courseId: string;
   dueDate: string;
+}
+
+// Leader Analytics types
+export interface LeaderMetrics {
+  leaderId: string;
+  leaderName: string;
+  leaderAvatar: string;
+  leaderJobTitle: string;
+  teamSize: number;
+  lastAccess: string;
+  actionsThisWeek: number;
+  teamCompletionRate: number;
+  pendingTasks: number;
+  engagementScore: number; // 0-100
+}
+
+export interface LeaderActionItem {
+  leaderId: string;
+  leaderName: string;
+  leaderAvatar: string;
+  issue: string;
+  severity: 'high' | 'medium' | 'low';
+  description: string;
+}
+
+// Persona/Profile types for prototype simulation
+export type PersonaRole = 'leader' | 'manager' | 'director';
+
+export interface Persona {
+  id: string;
+  name: string;
+  jobTitle: string;
+  avatarUrl: string;
+  role: PersonaRole;
+  description: string;
+  managedLeaderIds?: string[]; // For managers/directors
 }

@@ -4,8 +4,6 @@ import { analytics } from '../services/analytics';
 import { View } from '../types';
 
 interface SidebarProps {
-    currentView: 'leader' | 'admin';
-    setCurrentView: (view: 'leader' | 'admin') => void;
     activeView: View;
     setActiveView: (view: View) => void;
     activeSidebarItem: string;
@@ -17,7 +15,7 @@ const mainNavItems = [
   { id: 'pulses', icon: 'track_changes', label: 'Pulses', targetView: 'pulses' as View },
   { id: 'enrollments', icon: 'school', label: 'Matrículas', targetView: 'cursos' as View },
   { id: 'ranking', icon: 'leaderboard', label: 'Ranking', targetView: 'visaoGeral' as View },
-    { id: 'dashboard', icon: 'supervisor_account', label: 'Painel do Líder', targetView: 'visaoGeral' as View },
+    { id: 'dashboard', icon: 'supervisor_account', label: 'Liderança', targetView: 'visaoGeral' as View },
 ];
 
 const NavItem: React.FC<{
@@ -42,19 +40,12 @@ const NavItem: React.FC<{
   );
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, setActiveView, activeSidebarItem, setActiveSidebarItem }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ setActiveView, activeSidebarItem, setActiveSidebarItem }) => {
 
   const handleMainNavClick = (item: typeof mainNavItems[0]) => {
     analytics.track('sidebar_nav_clicked', { item: item.id, target_view: item.targetView });
-    setCurrentView('leader');
     setActiveView(item.targetView);
     setActiveSidebarItem(item.id);
-  };
-
-  const handleAdminClick = () => {
-    analytics.track('view_changed', { from: currentView, to: 'admin' });
-    setCurrentView('admin');
-    setActiveSidebarItem('admin');
   };
 
   return (
@@ -72,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, s
             key={item.id}
             icon={item.icon}
             label={item.label}
-            isActive={currentView === 'leader' && activeSidebarItem === item.id}
+            isActive={activeSidebarItem === item.id}
             onClick={() => handleMainNavClick(item)}
           />
         ))}
@@ -81,12 +72,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView, s
       <div className="flex-grow" />
 
       <nav className="w-full space-y-2 mb-2">
-        <NavItem
-          icon="settings"
-          label="Admin"
-          isActive={activeSidebarItem === 'admin'}
-          onClick={handleAdminClick}
-        />
         <NavItem
           icon="help"
           label="Ajuda"

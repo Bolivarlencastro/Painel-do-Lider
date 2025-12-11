@@ -2,8 +2,16 @@
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { SearchDialog } from './SearchDialog';
+import { PersonaSelector } from './PersonaSelector';
+import { Persona } from '../types';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  currentPersona: Persona;
+  personas: Persona[];
+  onPersonaChange: (persona: Persona) => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ currentPersona, personas, onPersonaChange }) => {
   const [isSearchOpen, setSearchOpen] = useState(false);
 
   const handleFullScreen = () => {
@@ -92,18 +100,11 @@ export const Header: React.FC = () => {
 
               <div className="hidden sm:block h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
 
-              <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                  <img
-                  className="h-8 w-8 rounded-full object-cover"
-                  src="https://i.pravatar.cc/40?u=leader"
-                  alt="User profile"
-                  />
-                  <div className="hidden md:flex flex-col items-start text-left">
-                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Maria Fernanda</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Líder de Vendas</span>
-                  </div>
-                  <Icon name="expand_more" className="hidden md:block text-gray-500 dark:text-gray-400" />
-              </button>
+              <PersonaSelector
+                currentPersona={currentPersona}
+                personas={personas}
+                onPersonaChange={onPersonaChange}
+              />
             </div>
           </div>
         </div>

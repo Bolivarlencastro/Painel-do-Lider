@@ -21,7 +21,8 @@ import { ChannelDetail } from './details/ChannelDetail';
 import { PulseDetail } from './details/PulseDetail';
 import { GamificationRanking } from './GamificationRanking';
 import { FreeEnrollmentsTable } from './FreeEnrollmentsTable';
-import { View, TeamMember, Course, Trail, Event, SelectedItem, Channel, Pulse, EnhancedKpiData, TrendDirection, MemberRankingItem, Enrollment, EnrollmentStatus, EnrollmentType } from '../types';
+import { AnalyticsView } from './AnalyticsView';
+import { View, MainView, TeamMember, Course, Trail, Event, SelectedItem, Channel, Pulse, EnhancedKpiData, TrendDirection, MemberRankingItem, Enrollment, EnrollmentStatus, EnrollmentType } from '../types';
 import { analytics } from '../services/analytics';
 import { LocalSortConfig } from './TeamMembersTable';
 import { ImpersonationSelector } from './ImpersonationSelector';
@@ -208,6 +209,7 @@ interface DashboardProps {
   isImpersonationEnabled: boolean;
   selectedLeaderIds: string[];
   setSelectedLeaderIds: (ids: string[]) => void;
+  managedLeaderIds: string[]; // IDs of leaders managed by current persona
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ 
@@ -228,7 +230,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
     isKpiComparisonEnabled,
     isImpersonationEnabled,
     selectedLeaderIds,
-    setSelectedLeaderIds
+    setSelectedLeaderIds,
+    managedLeaderIds
 }) => {
   const [isNpsModalOpen, setNpsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
@@ -283,7 +286,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const enhancedKpis = useMemo(() => calculateKpis(allTeamMembers, allCourses, allTrails, allPulses, allEnrollments, isKpiComparisonEnabled), [allTeamMembers, allCourses, allTrails, allPulses, allEnrollments, isKpiComparisonEnabled]);
 
-  const renderCurrentView = () => {
+  const renderManagementView = () => {
     switch (activeView) {
       case 'visaoGeral':
         return <OverviewView kpis={enhancedKpis} members={allTeamMembers} enrollments={allEnrollments} memberRanking={allMemberRanking} onMemberClick={(member) => handleItemClick('member', member)} onViewAllMembers={handleViewMembersWithFilter} isTeamEmpty={isTeamEmpty} isRankingEnabled={isRankingEnabled} isNormativasModuleEnabled={isNormativasModuleEnabled} />;
@@ -359,48 +362,95 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const isTableView = activeView !== 'visaoGeral';
   const tooltipText = "Todos os números e métricas se refletem aos liderados atuais do líder, sem contar dados de ex-liderados.";
 
+  // Drill-down logic: show Analytics when no leader selected, show Management when leader selected
+  const showAnalytics = managedLeaderIds.length > 0 && selectedLeaderIds.length === 0;
+  const showManagement = selectedLeaderIds.length > 0 || managedLeaderIds.length === 0;
+
+  const handleBackToAnalytics = () => {
+    analytics.track('back_to_analytics');
+    setSelectedLeaderIds([]);
+    setActiveSidebarItem('dashboard');
+  };
+
+  const handleLeaderClick = (leaderId: string) => {
+    if (leaderId === 'all') {
+      // Show all team members from all managed leaders
+      analytics.track('view_all_team_members');
+      setSelectedLeaderIds(managedLeaderIds);
+    } else {
+      // Show specific leader's team
+      analytics.track('leader_drilldown', { leaderId });
+      setSelectedLeaderIds([leaderId]);
+    }
+    setActiveView('visaoGeral');
+    setActiveSidebarItem('dashboard');
+  };
+
   return (
     <div className={`flex flex-col ${isTableView ? 'h-full' : ''}`}>
-        <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 shrink-0 bg-white dark:bg-gray-800">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Painel do Líder</h1>
-                <div className="relative group flex items-center">
-                    <Icon name="info" size="sm" className="text-gray-400 dark:text-gray-500 cursor-help" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-sm p-3 bg-gray-900 text-white text-left text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 z-[60] pointer-events-none">
-                        {tooltipText}
-                        <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-900"></div>
-                    </div>
-                </div>
-            </div>
-            <div className="flex items-center gap-4">
-              {isImpersonationEnabled && (
-                  <ImpersonationSelector
-                    leaders={leaders}
-                    selectedIds={selectedLeaderIds}
-                    onSelectionChange={setSelectedLeaderIds}
-                  />
+        {/* Content Area */}
+        {showAnalytics ? (
+          <AnalyticsView 
+            teamMembers={allTeamMembers} 
+            leaders={leaders} 
+            managedLeaderIds={managedLeaderIds}
+            onLeaderClick={handleLeaderClick}
+          />
+        ) : (
+          <>
+            <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 shrink-0 bg-white dark:bg-gray-800">
+              {/* Botão Voltar ao Analytics - acima do título */}
+              {managedLeaderIds.length > 0 && (
+                <button
+                  onClick={handleBackToAnalytics}
+                  className="flex items-center gap-1 mb-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                >
+                  <Icon name="arrow_back" size="sm" />
+                  <span>Voltar ao Analytics</span>
+                </button>
               )}
+              
+              <div className="flex items-center gap-2 mb-6">
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Painel do Líder</h1>
+                  <div className="relative group flex items-center">
+                      <Icon name="info" size="sm" className="text-gray-400 dark:text-gray-500 cursor-help" />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-sm p-3 bg-gray-900 text-white text-left text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 z-[60] pointer-events-none">
+                          {tooltipText}
+                          <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-900"></div>
+                      </div>
+                  </div>
+              </div>
+              
+              <div className="border-b border-gray-200 dark:border-gray-700">
+                <nav className="-mb-px flex items-center space-x-6" aria-label="Management tabs">
+                  {/* Filtro de Líder - como "primeira aba" */}
+                  {isImpersonationEnabled && (
+                    <div className="flex items-center gap-2 py-3 pr-6 border-r border-gray-300 dark:border-gray-600">
+                      <Icon name="filter_list" size="sm" className="text-gray-500 dark:text-gray-400" />
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Liderados de:</span>
+                      <ImpersonationSelector
+                        leaders={leaders}
+                        selectedIds={selectedLeaderIds}
+                        onSelectionChange={setSelectedLeaderIds}
+                      />
+                    </div>
+                  )}
+                  <TabButton<View> id="visaoGeral" label="Visão Geral" icon="dashboard" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={0} />
+                  <TabButton<View> id="liderados" label="Liderados" icon="group" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allTeamMembers.length} />
+                  <TabButton<View> id="cursos" label="Cursos" icon="rocket_launch" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allCourses.length} />
+                  <TabButton<View> id="trilhas" label="Trilhas" icon="timeline" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allTrails.length} />
+                  <TabButton<View> id="pulses" label="Pulses" icon="track_changes" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allPulses.length} />
+                  <TabButton<View> id="canais" label="Canais" icon="hub" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allChannels.length} />
+                  <TabButton<View> id="eventos" label="Eventos" icon="event" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allEvents.length} />
+                </nav>
+              </div>
             </div>
-          </div>
-          
-          <div className="border-b border-gray-200 dark:border-gray-700 mt-4">
-            <nav className="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
-              <TabButton<View> id="visaoGeral" label="Visão Geral" icon="dashboard" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={0} />
-              <TabButton<View> id="liderados" label="Liderados" icon="group" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allTeamMembers.length} />
-              <TabButton<View> id="cursos" label="Cursos" icon="rocket_launch" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allCourses.length} />
-              <TabButton<View> id="trilhas" label="Trilhas" icon="timeline" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allTrails.length} />
-              <TabButton<View> id="pulses" label="Pulses" icon="track_changes" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allPulses.length} />
-              <TabButton<View> id="canais" label="Canais" icon="hub" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allChannels.length} />
-              <TabButton<View> id="eventos" label="Eventos" icon="event" activeView={activeView} setActiveView={setActiveView} setActiveSidebarItem={setActiveSidebarItem} allItemsCount={allEvents.length} />
-            </nav>
-          </div>
-        </div>
-        
-      
-        <div className={isTableView ? 'flex-1 min-h-0' : ''}>
-          {renderCurrentView()}
-        </div>
+            
+            <div className={isTableView ? 'flex-1 min-h-0' : ''}>
+              {renderManagementView()}
+            </div>
+          </>
+        )}
 
         {renderDetailView()}
 

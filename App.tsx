@@ -3,9 +3,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
-import { AdminView } from './components/AdminView';
 import { DebugPanel } from './components/DebugPanel';
-import { Theme, View, Course, TeamMember, Trail, Event, Channel, Pulse, MemberRankingItem, MemberStatus, Enrollment } from './types';
+import { Theme, View, Course, TeamMember, Trail, Event, Channel, Pulse, MemberRankingItem, MemberStatus, Enrollment, Persona } from './types';
 import { analytics } from './services/analytics';
 import {
     TEAM_MEMBERS_DATA,
@@ -16,7 +15,8 @@ import {
     PULSES_DATA,
     // FIX: Imported missing ENROLLMENTS_DATA.
     ENROLLMENTS_DATA,
-    MEMBER_RANKING_DATA
+    MEMBER_RANKING_DATA,
+    PERSONAS
 } from './constants';
 
 const getInitialTheme = (): Theme => {
@@ -35,10 +35,11 @@ const daysFromNow = (days: number): string => new Date(Date.now() + (days * 24 *
 
 const App: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
-  const [currentView, setCurrentView] = useState<'leader' | 'admin'>('leader');
   const [activeDashboardView, setActiveDashboardView] = useState<View>('visaoGeral');
+  const [currentPersona, setCurrentPersona] = useState<Persona>(PERSONAS[0]); // Default to first persona
   const [activeSidebarItem, setActiveSidebarItem] = useState<string>('dashboard');
   const [activeEdgeCases, setActiveEdgeCases] = useState(new Set<string>());
+  // For drill-down: empty = show Analytics, populated = show specific leader(s)
   const [selectedLeaderIds, setSelectedLeaderIds] = useState<string[]>([]);
 
   const toggleEdgeCase = useCallback((caseName: string) => {
@@ -54,7 +55,29 @@ const App: React.FC = () => {
     });
   }, []);
   
-  const isImpersonationEnabled = activeEdgeCases.has('IMPERSONATE_LEADER');
+  // Auto-enable impersonation for managers and directors
+  const isImpersonationEnabled = activeEdgeCases.has('IMPERSONATE_LEADER') || 
+    currentPersona.role === 'manager' || 
+    currentPersona.role === 'director';
+
+  // Handle persona change
+  const handlePersonaChange = useCallback((persona: Persona) => {
+    setCurrentPersona(persona);
+    
+    // Clear drill-down when changing persona (show Analytics for managers/directors)
+    setSelectedLeaderIds([]);
+    
+    // Reset to overview when changing persona
+    setActiveDashboardView('visaoGeral');
+    setActiveSidebarItem('dashboard');
+    
+    analytics.track('persona_changed', {
+      fromPersona: currentPersona.name,
+      toPersona: persona.name,
+      fromRole: currentPersona.role,
+      toRole: persona.role
+    });
+  }, [currentPersona]);
 
   useEffect(() => {
     // Clear selection when impersonation is turned off
@@ -183,9 +206,26 @@ const App: React.FC = () => {
         channels = CHANNELS_DATA.filter(ch => channelIds.has(ch.id));
         pulses = PULSES_DATA.filter(p => pulseIds.has(p.id));
         memberRanking = MEMBER_RANKING_DATA.filter(r => memberIds.has(r.id));
-      } else if (isImpersonationEnabled) {
-        // If impersonation is on but no leader is selected, show an empty state
-        return { members: [], courses: [], trails: [], events: [], channels: [], pulses: [], enrollments: [], memberRanking: [] };
+      } else if (isImpersonationEnabled && currentPersona.managedLeaderIds && currentPersona.managedLeaderIds.length > 0) {
+        // When in Analytics view (no specific leader selected), show all team members of all managed leaders
+        const managedLeaderIdsSet = new Set(currentPersona.managedLeaderIds);
+        members = TEAM_MEMBERS_DATA.filter(m => m.managerId && managedLeaderIdsSet.has(m.managerId));
+        
+        const memberIds = new Set(members.map(m => m.id));
+        
+        enrollments = ENROLLMENTS_DATA.filter(e => memberIds.has(e.memberId));
+        const courseIds = new Set(enrollments.map(e => e.courseId));
+        const trailIds = new Set(members.flatMap(m => m.trailIds));
+        const eventIds = new Set(members.flatMap(m => m.eventIds));
+        const channelIds = new Set(members.flatMap(m => m.channelIds));
+        const pulseIds = new Set(members.flatMap(m => m.pulseIds));
+
+        courses = COURSES_DATA.filter(c => courseIds.has(c.id));
+        trails = TRAILS_DATA.filter(t => trailIds.has(t.id));
+        events = EVENTS_DATA.filter(e => eventIds.has(e.id));
+        channels = CHANNELS_DATA.filter(ch => channelIds.has(ch.id));
+        pulses = PULSES_DATA.filter(p => pulseIds.has(p.id));
+        memberRanking = MEMBER_RANKING_DATA.filter(r => memberIds.has(r.id));
       }
 
 
@@ -199,40 +239,39 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
       <Sidebar
-        currentView={currentView}
-        setCurrentView={setCurrentView}
         activeView={activeDashboardView}
         setActiveView={setActiveDashboardView}
         activeSidebarItem={activeSidebarItem}
         setActiveSidebarItem={setActiveSidebarItem}
       />
       <div className="flex-1 flex flex-col">
-        <Header />
+        <Header 
+          currentPersona={currentPersona}
+          personas={PERSONAS}
+          onPersonaChange={handlePersonaChange}
+        />
         <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-gray-900">
-          {currentView === 'leader' && (
-            <Dashboard
-              activeView={activeDashboardView}
-              // FIX: Corrected prop name from `setActiveView` to `setActiveDashboardView` to match the state setter.
-              setActiveView={setActiveDashboardView}
-              setActiveSidebarItem={setActiveSidebarItem}
-              teamMembers={modifiedData.members}
-              leaders={leaders}
-              courses={modifiedData.courses}
-              trails={modifiedData.trails}
-              events={modifiedData.events}
-              channels={modifiedData.channels}
-              pulses={modifiedData.pulses}
-              enrollments={modifiedData.enrollments}
-              memberRanking={modifiedData.memberRanking}
-              isRankingEnabled={isRankingEnabled}
-              isNormativasModuleEnabled={isNormativasModuleEnabled}
-              isKpiComparisonEnabled={isKpiComparisonEnabled}
-              isImpersonationEnabled={isImpersonationEnabled}
-              selectedLeaderIds={selectedLeaderIds}
-              setSelectedLeaderIds={setSelectedLeaderIds}
-            />
-           )}
-          {currentView === 'admin' && <AdminView />}
+          <Dashboard
+            activeView={activeDashboardView}
+            setActiveView={setActiveDashboardView}
+            setActiveSidebarItem={setActiveSidebarItem}
+            teamMembers={modifiedData.members}
+            leaders={leaders}
+            courses={modifiedData.courses}
+            trails={modifiedData.trails}
+            events={modifiedData.events}
+            channels={modifiedData.channels}
+            pulses={modifiedData.pulses}
+            enrollments={modifiedData.enrollments}
+            memberRanking={modifiedData.memberRanking}
+            isRankingEnabled={isRankingEnabled}
+            isNormativasModuleEnabled={isNormativasModuleEnabled}
+            isKpiComparisonEnabled={isKpiComparisonEnabled}
+            isImpersonationEnabled={isImpersonationEnabled}
+            selectedLeaderIds={selectedLeaderIds}
+            setSelectedLeaderIds={setSelectedLeaderIds}
+            managedLeaderIds={currentPersona.managedLeaderIds || []}
+          />
         </main>
       </div>
       <DebugPanel activeCases={activeEdgeCases} toggleCase={toggleEdgeCase} />

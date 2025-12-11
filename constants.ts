@@ -145,27 +145,51 @@ export const EVENTS_DATA: Event[] = [
 // FIX: Replaced 'courseIds' with 'enrollmentIds' and moved course assignments to ENROLLMENTS_DATA.
 export const TEAM_MEMBERS_DATA: TeamMember[] = [
   // LÍDERES (sem managerId)
-  { id: '5', name: 'Beatriz Lima', jobTitle: 'Coordenadora de Vendas', avatarUrl: 'https://i.pravatar.cc/40?u=5', overallProgress: 100, coursesCompleted: 5, totalCourses: 5, trailsCompleted: 4, totalTrails: 4, status: MemberStatus.Completed, enrollmentIds: ['enr-5-c1', 'enr-5-c2', 'enr-5-c3', 'enr-5-c4', 'enr-5-c5'], trailIds: ['t1', 't2', 't3', 't4'], eventIds: ['e1', 'e2', 'e3', 'e4', 'e5', 'e6'], channelIds: ['ch1', 'ch2', 'ch3'], pulseIds: ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11'], lastAccess: daysAgo(1) },
-  { id: '6', name: 'Carlos Dias', jobTitle: 'Gerente de Contas Sênior', avatarUrl: 'https://i.pravatar.cc/40?u=6', overallProgress: 60, coursesCompleted: 1, totalCourses: 2, trailsCompleted: 1, totalTrails: 1, status: MemberStatus.OnTrack, enrollmentIds: ['enr-6-c3', 'enr-6-c5'], trailIds: ['t2'], eventIds: ['e3', 'e6'], channelIds: ['ch3'], pulseIds: ['p5'], lastAccess: daysAgo(14) },
-  { id: '9', name: 'Camila Alves', jobTitle: 'Especialista de Produto', avatarUrl: 'https://i.pravatar.cc/40?u=9', overallProgress: 92, coursesCompleted: 4, totalCourses: 5, trailsCompleted: 2, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-9-c1', 'enr-9-c2', 'enr-9-c3', 'enr-9-c5'], trailIds: ['t2', 't3'], eventIds: ['e1','e3', 'e6'], channelIds: ['ch2','ch3'], pulseIds: ['p3','p4','p5','p7','p9'], lastAccess: daysAgo(2) },
+  // ✅ CASO POSITIVO - Time engajado e ativo
+  { id: '5', name: 'Beatriz Lima', jobTitle: 'Coordenadora de Vendas', avatarUrl: 'https://i.pravatar.cc/40?u=5', overallProgress: 100, coursesCompleted: 5, totalCourses: 5, trailsCompleted: 4, totalTrails: 4, status: MemberStatus.Completed, enrollmentIds: ['enr-5-c1', 'enr-5-c2', 'enr-5-c3', 'enr-5-c4', 'enr-5-c5'], trailIds: ['t1', 't2', 't3', 't4'], eventIds: ['e1', 'e2', 'e3', 'e4', 'e5', 'e6'], channelIds: ['ch1', 'ch2', 'ch3'], pulseIds: ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11'], lastAccess: daysAgo(1), performance: 95 },
+  { id: '6', name: 'Carlos Dias', jobTitle: 'Gerente de Contas Sênior', avatarUrl: 'https://i.pravatar.cc/40?u=6', overallProgress: 85, coursesCompleted: 3, totalCourses: 4, trailsCompleted: 2, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-6-c3', 'enr-6-c5'], trailIds: ['t2'], eventIds: ['e3', 'e6'], channelIds: ['ch3'], pulseIds: ['p5'], lastAccess: daysAgo(3), performance: 88 },
+  
+  // ⚠️ CASO NEUTRO - Performance mista
+  { id: '9', name: 'Camila Alves', jobTitle: 'Especialista de Produto', avatarUrl: 'https://i.pravatar.cc/40?u=9', overallProgress: 65, coursesCompleted: 2, totalCourses: 4, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-9-c1', 'enr-9-c2', 'enr-9-c3', 'enr-9-c5'], trailIds: ['t2', 't3'], eventIds: ['e1','e3', 'e6'], channelIds: ['ch2','ch3'], pulseIds: ['p3','p4','p5','p7','p9'], lastAccess: daysAgo(8), performance: 62 },
+  { id: '11', name: 'Eduardo Martins', jobTitle: 'Coordenador de Suporte', avatarUrl: 'https://i.pravatar.cc/40?u=11', overallProgress: 55, coursesCompleted: 1, totalCourses: 3, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-11-c1','enr-11-c2','enr-11-c5'], trailIds: ['t1', 't2'], eventIds: ['e1','e2', 'e5', 'e4'], channelIds: ['ch1'], pulseIds: ['p1','p2'], lastAccess: daysAgo(12), performance: 58 },
+  
+  // ❌ CASO NEGATIVO - Baixo desempenho e inatividade
+  { id: '7', name: 'Fernanda Costa', jobTitle: 'Gerente de Projetos', avatarUrl: 'https://i.pravatar.cc/40?u=7', overallProgress: 25, coursesCompleted: 0, totalCourses: 3, trailsCompleted: 0, totalTrails: 2, status: MemberStatus.Late, enrollmentIds: ['enr-7-c1', 'enr-7-c5', 'enr-7-c7'], trailIds: ['t1', 't2'], eventIds: ['e5'], channelIds: ['ch1'], pulseIds: ['p1', 'p2'], lastAccess: daysAgo(45), performance: 28 },
+  { id: '8', name: 'Gustavo Silva', jobTitle: 'Supervisor de Logística', avatarUrl: 'https://i.pravatar.cc/40?u=8', overallProgress: 15, coursesCompleted: 0, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.Late, enrollmentIds: ['enr-8-c3', 'enr-8-c7'], trailIds: ['t3'], eventIds: ['e1', 'e4'], channelIds: ['ch2'], pulseIds: [], lastAccess: daysAgo(62), performance: 18 },
+  { id: '10', name: 'Helena Oliveira', jobTitle: 'Coordenadora de TI', avatarUrl: 'https://i.pravatar.cc/40?u=10', overallProgress: 10, coursesCompleted: 0, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.NotStarted, enrollmentIds: ['enr-10-c1','enr-10-c5'], trailIds: ['t1','t2'], eventIds: ['e2', 'e4'], channelIds: ['ch1','ch3'], pulseIds: ['p1','p2','p5'], lastAccess: daysAgo(90), performance: 12 },
+  
   { id: '1', name: 'Ana Clara', jobTitle: 'Analista de RH', avatarUrl: 'https://i.pravatar.cc/40?u=1', overallProgress: 0, coursesCompleted: 0, totalCourses: 0, trailsCompleted: 0, totalTrails: 0, status: MemberStatus.Empty, enrollmentIds: [], trailIds: [], eventIds: ['e2'], channelIds: [], pulseIds: [], lastAccess: daysAgo(90) },
 
   // LIDERADOS (com managerId)
-  // Time Beatriz Lima (id: 5)
-  { id: '2', name: 'João Silva', jobTitle: 'Vendedor Sênior', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=2', overallProgress: 25, coursesCompleted: 1, totalCourses: 3, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.Late, enrollmentIds: ['enr-2-c1', 'enr-2-c5', 'enr-2-c6', 'enr-2-c2'], trailIds: ['t1', 't2'], eventIds: ['e2', 'e5', 'e4'], channelIds: ['ch1', 'ch3'], pulseIds: ['p1', 'p5', 'p6', 'p9'], lastAccess: daysAgo(12) },
-  { id: '11', name: 'Gabriela Ferreira', jobTitle: 'Vendedora Pleno', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=11', overallProgress: 80, coursesCompleted: 3, totalCourses: 4, trailsCompleted: 2, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-11-c1','enr-11-c2','enr-11-c5'], trailIds: ['t1', 't2'], eventIds: ['e1','e2', 'e5', 'e4'], channelIds: ['ch1'], pulseIds: ['p1','p2'], lastAccess: daysAgo(4) },
-  { id: '7', name: 'Juliana Costa', jobTitle: 'Vendedora Pleno', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=7', overallProgress: 40, coursesCompleted: 1, totalCourses: 3, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-7-c1', 'enr-7-c5', 'enr-7-c7'], trailIds: ['t1', 't2'], eventIds: ['e5'], channelIds: ['ch1'], pulseIds: ['p1', 'p2'], lastAccess: daysAgo(18) },
-  { id: '4', name: 'Pedro Henrique', jobTitle: 'Vendedor Júnior', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=4', overallProgress: 20, coursesCompleted: 0, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.OnTrack, enrollmentIds: ['enr-4-c1', 'enr-4-c4', 'enr-4-c2'], trailIds: ['t4'], eventIds: ['e1', 'e4'], channelIds: [], pulseIds: [], lastAccess: daysAgo(28) },
-  { id: '13', name: 'Fernando Rocha', jobTitle: 'Analista de Vendas', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=13', overallProgress: 10, coursesCompleted: 0, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.Late, enrollmentIds: ['enr-13-c6', 'enr-13-c3'], trailIds: ['t1'], eventIds: [], channelIds: ['ch1'], pulseIds: [], lastAccess: daysAgo(25) },
-  { id: '14', name: 'Renata Gonçalves', jobTitle: 'Assistente de Vendas', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=14', overallProgress: 5, coursesCompleted: 0, totalCourses: 1, trailsCompleted: 0, totalTrails: 0, status: MemberStatus.NotStarted, enrollmentIds: ['enr-14-c1', 'enr-14-c4'], trailIds: [], eventIds: [], channelIds: [], pulseIds: [], lastAccess: daysAgo(50) },
+  
+  // ✅ Time Beatriz Lima (id: 5) - CASO POSITIVO: Alta performance
+  { id: '21', name: 'Gabriela Ferreira', jobTitle: 'Vendedora Pleno', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=21', overallProgress: 95, coursesCompleted: 4, totalCourses: 4, trailsCompleted: 2, totalTrails: 2, status: MemberStatus.Completed, enrollmentIds: ['enr-21-c1','enr-21-c2','enr-21-c5'], trailIds: ['t1', 't2'], eventIds: ['e1','e2', 'e5', 'e4'], channelIds: ['ch1'], pulseIds: ['p1','p2'], lastAccess: daysAgo(1), performance: 92 },
+  { id: '22', name: 'João Silva', jobTitle: 'Vendedor Sênior', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=22', overallProgress: 88, coursesCompleted: 3, totalCourses: 3, trailsCompleted: 2, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-22-c1', 'enr-22-c5', 'enr-22-c2'], trailIds: ['t1', 't2'], eventIds: ['e2', 'e5', 'e4'], channelIds: ['ch1', 'ch3'], pulseIds: ['p1', 'p5', 'p6', 'p9'], lastAccess: daysAgo(2), performance: 85 },
+  { id: '23', name: 'Juliana Costa', jobTitle: 'Vendedora Pleno', managerId: '5', avatarUrl: 'https://i.pravatar.cc/40?u=23', overallProgress: 82, coursesCompleted: 3, totalCourses: 4, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-23-c1', 'enr-23-c5'], trailIds: ['t1', 't2'], eventIds: ['e5'], channelIds: ['ch1'], pulseIds: ['p1', 'p2'], lastAccess: daysAgo(3), performance: 80 },
 
-  // Time Carlos Dias (id: 6)
-  { id: '10', name: 'Ricardo Pereira', jobTitle: 'Gerente de Contas', managerId: '6', avatarUrl: 'https://i.pravatar.cc/40?u=10', overallProgress: 75, coursesCompleted: 2, totalCourses: 3, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-10-c1','enr-10-c5'], trailIds: ['t1','t2'], eventIds: ['e2', 'e4'], channelIds: ['ch1','ch3'], pulseIds: ['p1','p2','p5'], lastAccess: daysAgo(10) },
-  { id: '12', name: 'Lucas Martins', jobTitle: 'Gerente de Contas Jr', managerId: '6', avatarUrl: 'https://i.pravatar.cc/40?u=12', overallProgress: 55, coursesCompleted: 2, totalCourses: 4, trailsCompleted: 1, totalTrails: 1, status: MemberStatus.OnTrack, enrollmentIds: ['enr-12-c1','enr-12-c3'], trailIds: ['t4'], eventIds: ['e3', 'e6'], channelIds: ['ch1', 'ch2'], pulseIds: ['p1','p3','p8'], lastAccess: daysAgo(22) },
+  // ✅ Time Carlos Dias (id: 6) - CASO POSITIVO: Boa performance
+  { id: '24', name: 'Ricardo Pereira', jobTitle: 'Gerente de Contas', managerId: '6', avatarUrl: 'https://i.pravatar.cc/40?u=24', overallProgress: 90, coursesCompleted: 3, totalCourses: 3, trailsCompleted: 2, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-24-c1','enr-24-c5'], trailIds: ['t1','t2'], eventIds: ['e2', 'e4'], channelIds: ['ch1','ch3'], pulseIds: ['p1','p2','p5'], lastAccess: daysAgo(2), performance: 88 },
+  { id: '25', name: 'Lucas Martins', jobTitle: 'Gerente de Contas Jr', managerId: '6', avatarUrl: 'https://i.pravatar.cc/40?u=25', overallProgress: 78, coursesCompleted: 2, totalCourses: 3, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-25-c1','enr-25-c3'], trailIds: ['t4'], eventIds: ['e3', 'e6'], channelIds: ['ch1', 'ch2'], pulseIds: ['p1','p3','p8'], lastAccess: daysAgo(5), performance: 75 },
 
-  // Time Camila Alves (id: 9)
-  { id: '3', name: 'Maria Souza', jobTitle: 'Analista de Marketing', managerId: '9', avatarUrl: 'https://i.pravatar.cc/40?u=3', overallProgress: 70, coursesCompleted: 1, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.OnTrack, enrollmentIds: ['enr-3-c1', 'enr-3-c2', 'enr-3-c3'], trailIds: ['t3'], eventIds: ['e1', 'e6', 'e4'], channelIds: ['ch2'], pulseIds: ['p3', 'p7'], lastAccess: daysAgo(8) },
-  { id: '8', name: 'Rafael Martins', jobTitle: 'Estagiário de Marketing', managerId: '9', avatarUrl: 'https://i.pravatar.cc/40?u=8', overallProgress: 15, coursesCompleted: 0, totalCourses: 3, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.NotStarted, enrollmentIds: ['enr-8-c3', 'enr-8-c7'], trailIds: ['t3'], eventIds: ['e1', 'e4'], channelIds: ['ch2'], pulseIds: [], lastAccess: daysAgo(35) },
+  // ⚠️ Time Camila Alves (id: 9) - CASO NEUTRO: Performance mista
+  { id: '31', name: 'Maria Souza', jobTitle: 'Analista de Marketing', managerId: '9', avatarUrl: 'https://i.pravatar.cc/40?u=31', overallProgress: 70, coursesCompleted: 2, totalCourses: 3, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-31-c1', 'enr-31-c2', 'enr-31-c3'], trailIds: ['t3'], eventIds: ['e1', 'e6', 'e4'], channelIds: ['ch2'], pulseIds: ['p3', 'p7'], lastAccess: daysAgo(7), performance: 68 },
+  { id: '32', name: 'Rafael Martins', jobTitle: 'Estagiário de Marketing', managerId: '9', avatarUrl: 'https://i.pravatar.cc/40?u=32', overallProgress: 45, coursesCompleted: 1, totalCourses: 3, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.OnTrack, enrollmentIds: ['enr-32-c3'], trailIds: ['t3'], eventIds: ['e1', 'e4'], channelIds: ['ch2'], pulseIds: [], lastAccess: daysAgo(15), performance: 48 },
+
+  // ⚠️ Time Eduardo Martins (id: 11) - CASO NEUTRO: Alguns problemas
+  { id: '33', name: 'Paula Santos', jobTitle: 'Analista de Suporte', managerId: '11', avatarUrl: 'https://i.pravatar.cc/40?u=33', overallProgress: 60, coursesCompleted: 1, totalCourses: 2, trailsCompleted: 1, totalTrails: 2, status: MemberStatus.OnTrack, enrollmentIds: ['enr-33-c1'], trailIds: ['t1'], eventIds: ['e2'], channelIds: ['ch1'], pulseIds: ['p1'], lastAccess: daysAgo(10), performance: 58 },
+  { id: '34', name: 'Diego Lima', jobTitle: 'Técnico de Suporte', managerId: '11', avatarUrl: 'https://i.pravatar.cc/40?u=34', overallProgress: 35, coursesCompleted: 0, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.Late, enrollmentIds: ['enr-34-c2'], trailIds: ['t1'], eventIds: [], channelIds: [], pulseIds: [], lastAccess: daysAgo(20), performance: 38 },
+
+  // ❌ Time Fernanda Costa (id: 7) - CASO NEGATIVO: Baixo engajamento
+  { id: '41', name: 'Pedro Henrique', jobTitle: 'Analista de Projetos', managerId: '7', avatarUrl: 'https://i.pravatar.cc/40?u=41', overallProgress: 30, coursesCompleted: 0, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.Late, enrollmentIds: ['enr-41-c1', 'enr-41-c4'], trailIds: ['t4'], eventIds: ['e1', 'e4'], channelIds: [], pulseIds: [], lastAccess: daysAgo(40), performance: 32 },
+  { id: '42', name: 'Carla Almeida', jobTitle: 'Coordenadora de Projetos', managerId: '7', avatarUrl: 'https://i.pravatar.cc/40?u=42', overallProgress: 20, coursesCompleted: 0, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.Late, enrollmentIds: ['enr-42-c2'], trailIds: ['t1'], eventIds: [], channelIds: [], pulseIds: [], lastAccess: daysAgo(55), performance: 22 },
+
+  // ❌ Time Gustavo Silva (id: 8) - CASO NEGATIVO: Muito atrasado
+  { id: '43', name: 'Fernando Rocha', jobTitle: 'Analista de Logística', managerId: '8', avatarUrl: 'https://i.pravatar.cc/40?u=43', overallProgress: 15, coursesCompleted: 0, totalCourses: 2, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.Late, enrollmentIds: ['enr-43-c6', 'enr-43-c3'], trailIds: ['t1'], eventIds: [], channelIds: ['ch1'], pulseIds: [], lastAccess: daysAgo(60), performance: 18 },
+  { id: '44', name: 'Renata Gonçalves', jobTitle: 'Assistente de Logística', managerId: '8', avatarUrl: 'https://i.pravatar.cc/40?u=44', overallProgress: 5, coursesCompleted: 0, totalCourses: 1, trailsCompleted: 0, totalTrails: 0, status: MemberStatus.NotStarted, enrollmentIds: ['enr-44-c1'], trailIds: [], eventIds: [], channelIds: [], pulseIds: [], lastAccess: daysAgo(75), performance: 8 },
+
+  // ❌ Time Helena Oliveira (id: 10) - CASO NEGATIVO: Inativo
+  { id: '45', name: 'Thiago Barbosa', jobTitle: 'Analista de TI', managerId: '10', avatarUrl: 'https://i.pravatar.cc/40?u=45', overallProgress: 10, coursesCompleted: 0, totalCourses: 1, trailsCompleted: 0, totalTrails: 1, status: MemberStatus.NotStarted, enrollmentIds: ['enr-45-c5'], trailIds: ['t2'], eventIds: [], channelIds: [], pulseIds: [], lastAccess: daysAgo(80), performance: 12 },
+  { id: '46', name: 'Vanessa Costa', jobTitle: 'Técnica de TI', managerId: '10', avatarUrl: 'https://i.pravatar.cc/40?u=46', overallProgress: 8, coursesCompleted: 0, totalCourses: 1, trailsCompleted: 0, totalTrails: 0, status: MemberStatus.NotStarted, enrollmentIds: ['enr-46-c3'], trailIds: [], eventIds: [], channelIds: [], pulseIds: [], lastAccess: daysAgo(95), performance: 10 },
 ];
 
 
@@ -287,4 +311,45 @@ export const MEMBER_CONTENT_PROGRESS_DATA: MemberContentProgress[] = [
     
     // Fernando Rocha (13) on course c6 (compliance)
     { memberId: '13', contentId: 'cc6-1', firstAccess: daysAgo(22), lastAccess: daysAgo(22), timeSpentSeconds: 300, status: ConsumptionStatus.EmAndamento, points: 0, performance: 5 },
+];
+
+// --- PERSONAS FOR PROTOTYPE SIMULATION ---
+import { Persona } from './types';
+
+export const PERSONAS: Persona[] = [
+  {
+    id: 'persona-leader-1',
+    name: 'Beatriz Lima',
+    jobTitle: 'Coordenadora de Vendas',
+    avatarUrl: 'https://i.pravatar.cc/40?u=5',
+    role: 'leader',
+    description: 'Lidera equipe de 6 vendedores. Vê apenas seu time no Painel do Líder.',
+  },
+  {
+    id: 'persona-director-positive',
+    name: 'Maria Fernandes',
+    jobTitle: 'Diretora de Vendas',
+    avatarUrl: 'https://i.pravatar.cc/40?u=director',
+    role: 'director',
+    description: '✅ Caso POSITIVO: Equipe engajada, boas taxas de conclusão, líderes ativos (Beatriz, Carlos).',
+    managedLeaderIds: ['5', '6'], // Gerencia Beatriz e Carlos (times com bom desempenho)
+  },
+  {
+    id: 'persona-director-neutral',
+    name: 'Paulo Silva',
+    jobTitle: 'Diretor de Operações',
+    avatarUrl: 'https://i.pravatar.cc/40?u=paulo',
+    role: 'director',
+    description: '⚠️ Caso NEUTRO: Performance mista, alguns líderes precisam atenção (Camila, Eduardo).',
+    managedLeaderIds: ['9', '11'], // Gerencia Camila e Eduardo (performance mediana)
+  },
+  {
+    id: 'persona-director-negative',
+    name: 'Carla Santos',
+    jobTitle: 'Diretora Comercial',
+    avatarUrl: 'https://i.pravatar.cc/40?u=carla',
+    role: 'director',
+    description: '❌ Caso NEGATIVO: Baixo engajamento, muitos atrasos, líderes inativos (Fernanda, Gustavo, Helena).',
+    managedLeaderIds: ['7', '8', '10'], // Gerencia Fernanda, Gustavo, Helena (times com problemas)
+  },
 ];

@@ -62,14 +62,8 @@ export const ImpersonationSelector: React.FC<ImpersonationSelectorProps> = ({ le
     if (selectedLeaders.length === 0) {
       return (
         <>
-          <div className="h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-            <Icon name="groups" className="text-gray-600 dark:text-gray-300" />
-          </div>
-          <div className="hidden md:flex flex-col items-start text-left">
-            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Visão Geral</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">Selecione um líder ou área</span>
-          </div>
-          <Icon name="expand_more" className="hidden md:block text-gray-500 dark:text-gray-400" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Todos os líderes</span>
+          <Icon name="expand_more" className="text-gray-500 dark:text-gray-400" />
         </>
       );
     }
@@ -77,31 +71,15 @@ export const ImpersonationSelector: React.FC<ImpersonationSelectorProps> = ({ le
       const leader = selectedLeaders[0];
       return (
         <>
-          <img
-            className="h-8 w-8 rounded-full object-cover"
-            src={leader.avatarUrl}
-            alt={leader.name}
-          />
-          <div className="hidden md:flex flex-col items-start text-left">
-            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate max-w-28">{leader.name}</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-28">{leader.jobTitle}</span>
-          </div>
-          <Icon name="expand_more" className="hidden md:block text-gray-500 dark:text-gray-400" />
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-40">{leader.name}</span>
+          <Icon name="expand_more" className="text-gray-500 dark:text-gray-400" />
         </>
       );
     }
     return (
       <>
-        <div className="flex -space-x-3">
-          {selectedLeaders.slice(0, 3).map(m => 
-            <img key={m.id} className="h-8 w-8 rounded-full object-cover border-2 border-white dark:border-gray-800" src={m.avatarUrl} alt={m.name} />
-          )}
-        </div>
-        <div className="hidden md:flex flex-col items-start text-left">
-          <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{selectedLeaders.length} Líderes</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">Visão consolidada</span>
-        </div>
-        <Icon name="expand_more" className="hidden md:block text-gray-500 dark:text-gray-400" />
+        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{selectedLeaders.length} líderes</span>
+        <Icon name="expand_more" className="text-gray-500 dark:text-gray-400" />
       </>
     );
   };
@@ -110,13 +88,13 @@ export const ImpersonationSelector: React.FC<ImpersonationSelectorProps> = ({ le
     <div className="relative" ref={wrapperRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors w-full"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
       >
         {renderTriggerContent()}
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-2xl z-50 border border-gray-200 dark:border-gray-700 animate-fadeInUp">
+        <div className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-2xl z-[60] border border-gray-200 dark:border-gray-700 animate-fadeInUp">
           <div className="p-2 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
               <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
